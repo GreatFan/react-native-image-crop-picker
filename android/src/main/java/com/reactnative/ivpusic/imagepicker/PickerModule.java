@@ -340,11 +340,25 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
 
     private void initiatePicker(final Activity activity) {
         try {
+            
+            ////Added this block to replace the commented out block below
+            //based on this bug: https://github.com/ivpusic/react-native-image-crop-picker/issues/980
+            if (cropping || mediaType.equals("photo")) {
+                final Intent libraryIntent = new Intent(Intent.ACTION_PICK,MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                activity.startActivityForResult(libraryIntent, IMAGE_PICKER_REQUEST);
+                return;
+            }
+            ///////////////////
+                        
             final Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
 
+            /////Commented this out, using the block above
+            /*
             if (cropping || mediaType.equals("photo")) {
                 galleryIntent.setType("image/*");
-            } else if (mediaType.equals("video")) {
+            } else 
+            */  
+            if (mediaType.equals("video")) {
                 galleryIntent.setType("video/*");
             } else {
                 galleryIntent.setType("*/*");
@@ -358,6 +372,7 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
 
             final Intent chooserIntent = Intent.createChooser(galleryIntent, "Pick an image");
             activity.startActivityForResult(chooserIntent, IMAGE_PICKER_REQUEST);
+            
         } catch (Exception e) {
             resultCollector.notifyProblem(E_FAILED_TO_SHOW_PICKER, e);
         }
